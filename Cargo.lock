@@ -1362,11 +1362,12 @@ checksum = "66b7e2430c6dff6a955451e2cfc438f09cea1965a9d6f87f7e3b90decc014099"
 
 [[package]]
 name = "enum2schema"
-version = "0.1.1"
+version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a54057e81722091882087bbb8924abe368ec71c2dd15e539f0eb26e07360ecd3"
+checksum = "11d325a574526ab9a609ee97c22e68eee0a6937f408f079dee6a932ad2ae5fee"
 dependencies = [
  "enum2schema_derive",
+ "nalgebra-glm",
  "serde_json",
 ]
 
@@ -1589,9 +1590,9 @@ dependencies = [
 
 [[package]]
 name = "freecs"
-version = "2.0.1"
+version = "2.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "13983eed2e01937416cdc3c788fa221b57acc67ce2d12aa548dc489a8f2b7ddc"
+checksum = "1d03a4994aa31496def6d4bd997e68a9ac2672ee303526e5786a094738ef2fff"
 dependencies = [
  "paste",
  "rayon",
@@ -3170,9 +3171,9 @@ checksum = "60993920e071b0c9b66f14e2b32740a4e27ffc82854dcd72035887f336a09a28"
 
 [[package]]
 name = "nightshade"
-version = "0.43.0"
+version = "0.50.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "5e88726b2c791b2535a598c603429cd53afeaaf009e33c06259a4d82619a2e6b"
+checksum = "8cb56eb36e0f8f1b64a9a94747a61bb4b40d600a33a29f9318153b8d0062a12d"
 dependencies = [
  "accesskit",
  "accesskit_winit",
@@ -3225,11 +3226,22 @@ dependencies = [
 
 [[package]]
 name = "nightshade-api"
-version = "0.43.0"
+version = "0.50.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2aa5f7f8916b43a8ce755041771ad7e28c12c37f100121d47cc65626e7eb7f06"
+checksum = "adb96908157b7cabab0e3d9dc5c71144043775b3335f84d015d6860bc4123c06"
 dependencies = [
+ "bincode",
+ "console_error_panic_hook",
+ "enum2schema",
+ "js-sys",
+ "leptos",
  "nightshade",
+ "serde",
+ "serde-wasm-bindgen",
+ "serde_json",
+ "wasm-bindgen",
+ "wasm-bindgen-futures",
+ "web-sys",
 ]
 
 [[package]]
@@ -4838,6 +4850,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "sha1_smol"
+version = "1.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bbfa15b3dddfee50a0fff136974b3e1bde555604ba463834a7eb7deb6417705d"
+
+[[package]]
 name = "sha2"
 version = "0.10.9"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -5236,12 +5254,11 @@ name = "template_api_leptos"
 version = "0.1.0"
 dependencies = [
  "console_error_panic_hook",
- "js-sys",
  "leptos",
+ "nightshade-api",
  "protocol",
- "serde-wasm-bindgen",
+ "serde_json",
  "wasm-bindgen",
- "wasm-bindgen-futures",
  "web-sys",
 ]
 
@@ -5765,6 +5782,7 @@ dependencies = [
  "getrandom 0.4.2",
  "js-sys",
  "serde_core",
+ "sha1_smol",
  "wasm-bindgen",
 ]
 
@@ -6980,16 +6998,12 @@ dependencies = [
 name = "worker"
 version = "0.1.0"
 dependencies = [
- "console_error_panic_hook",
- "js-sys",
  "nightshade",
  "nightshade-api",
  "protocol",
  "serde",
- "serde-wasm-bindgen",
+ "serde_json",
  "wasm-bindgen",
- "wasm-bindgen-futures",
- "web-sys",
 ]
 
 [[package]]
