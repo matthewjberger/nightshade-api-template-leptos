@@ -18,7 +18,7 @@ just run-web   # serve in the browser via trunk
 Two threads, one seam. The page never touches the engine and the worker never touches the DOM. The transport (input, resize, picking, stats) is built into `nightshade-api`; only game messages are yours, carried as `Custom` payloads.
 
 - `protocol/` is the game wire format: the `Command` (page to worker) and `Event` (worker to page) enums, shared by both sides.
-- `worker/` is the game. `src/lib.rs` hands `nightshade_api::offscreen::run_offscreen` the scene, a setup function, a per-frame tick, and a `Command` handler. `src/state.rs` holds the plain `Scene` data, and `src/systems/` is the game logic as straight-line `nightshade-api` calls.
+- `worker/` is the game. `src/lib.rs` hands `nightshade_api::offscreen::run_offscreen` the driver config, the scene, a setup function, a per-frame tick, and a `Command` handler. `src/state.rs` holds the plain `Scene` data, and `src/systems/` is the game logic as straight-line `nightshade-api` calls.
 - `src/` is the page. `app.rs` creates the engine handle with `use_engine` and composes `EngineViewport`, the HUD, and the loader from `nightshade_api::web`; `state.rs` is the game-specific page state as `Copy` signals; renderer facts (ready, adapter, FPS, entities, selection) arrive on the handle's reactive `EngineState`.
 
 Grow it by adding a `protocol` variant, sending it with `engine.send`, handling it in `apply_custom` (`worker/src/systems/example.rs`), and building the UI under `components/`. The `Paint Selected` button shows the round trip: the driver's built-in click pick reports the selection to the page and hands it to `apply_custom` on the worker.

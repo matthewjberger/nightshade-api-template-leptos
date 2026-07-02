@@ -8,11 +8,13 @@
 mod state;
 mod systems;
 
+use nightshade_api::offscreen::OffscreenConfig;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen(start)]
 pub fn start() {
     nightshade_api::offscreen::run_offscreen(
+        OffscreenConfig::default(),
         state::Scene::new(),
         systems::setup::initialize,
         systems::example::tick,
