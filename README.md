@@ -1,8 +1,8 @@
 # template_api_leptos
 
-A [nightshade-api](https://crates.io/crates/nightshade-api) app with a [Leptos](https://leptos.dev) frontend. The engine runs in a web worker on an `OffscreenCanvas`, off the browser's main thread, and the scene and per-frame logic are written against the `nightshade-api` facade: plain data and free functions, no user-side ECS. A Leptos UI on the main thread overlays it and talks to the worker through typed `postMessage`. Copy this directory to start a project.
+A [nightshade-api](https://crates.io/crates/nightshade-api) app with a [Leptos](https://leptos.dev) frontend. The engine runs in a web worker on an `OffscreenCanvas`, off the browser's main thread, and the scene and per-frame logic are written against the `nightshade-api` facade: plain data and free functions, no user-side ECS. A Leptos UI on the main thread overlays it. The worker seam (canvas transfer, input forwarding, picking, resize, stats) is `nightshade-api` itself: the `leptos` feature on the page side, the `offscreen` feature on the worker side. Copy this directory to start a project.
 
-This is the same architecture as `template_leptos`, with one difference: the worker drives the engine through `nightshade-api` instead of the raw `nightshade` engine. Compare the two `worker/` crates to see what the facade buys you.
+This is the same architecture as `template_leptos`, with one difference: the worker's game logic is written against `nightshade-api` instead of the raw `nightshade` engine. Compare the two `worker/` crates to see what the facade buys you.
 
 ## Run
 
@@ -15,23 +15,13 @@ just run-web   # serve in the browser via trunk
 
 ## How it works
 
-Two threads, one seam. The page never touches the engine and the worker never touches the DOM; everything crosses through the `protocol` messages.
+Two threads, one seam. The page never touches the engine and the worker never touches the DOM. The transport (input, resize, picking, stats) is built into `nightshade-api`; only game messages are yours, carried as `Custom` payloads.
 
-- `protocol/` is the wire format: the `ClientMessage` (page to worker) and `WorkerMessage` (worker to page) enums, shared by both sides.
-- `worker/` is the engine. `src/lib.rs` owns the `OffscreenCanvas`, builds the renderer, and runs the offscreen frame loop; it decodes `ClientMessage`s and injects them as engine input. `src/state.rs` holds the plain `Scene` data, and `src/systems/` is the game logic as straight-line `nightshade-api` calls (`setup`, `example`, `picking`).
-- `src/` is the page. `app.rs` composes the components and forwards keyboard input, `bridge.rs` spawns the worker and turns its messages into signal writes, `state.rs` is the page state as `Copy` signals, and `components/` holds the viewport canvas, the HUD, and the loader.
+- `protocol/` is the game wire format: the `Command` (page to worker) and `Event` (worker to page) enums, shared by both sides.
+- `worker/` is the game. `src/lib.rs` hands `nightshade_api::offscreen::run_offscreen` the scene, a setup function, a per-frame tick, and a `Command` handler. `src/state.rs` holds the plain `Scene` data, and `src/systems/` is the game logic as straight-line `nightshade-api` calls.
+- `src/` is the page. `app.rs` creates the engine handle with `use_engine` and composes `EngineViewport`, the HUD, and the loader from `nightshade_api::web`; `state.rs` is the game-specific page state as `Copy` signals; renderer facts (ready, adapter, FPS, entities, selection) arrive on the handle's reactive `EngineState`.
 
-The page transfers its canvas to the worker once, then forwards pointer, touch, wheel, and keyboard input. The worker streams back the adapter, FPS, entity and cube counts, and the current selection. Grow it by adding a `protocol` message, handling it in `bridge.rs` and `worker/src/lib.rs`, and building the UI under `components/`.
-
-## nightshade-api in a worker
-
-The facade's `run!`/`open()` entry points own a window on the main thread, which a worker cannot use. So the worker drives the engine's offscreen frame loop directly (`initialize_offscreen`, `tick_offscreen`, `resize_offscreen`) and writes the scene and systems against the facade:
-
-- `setup.rs` calls `set_background`, `show_grid`, `orbit_camera`, `spawn_floor`, and `spawn_cube`.
-- `example.rs` calls `rotate`, `set_color`, `delta_time`, and `key_pressed`.
-- `picking.rs` calls `entity_under_cursor`, the facade's synchronous ray pick.
-
-The `Scene` is plain data implementing the engine's `State` trait, the one piece of plumbing the offscreen loop needs. Only the parts the facade does not expose from a worker drop to the raw engine: the renderer, the offscreen driver, input injection, and the selection outline.
+Grow it by adding a `protocol` variant, sending it with `engine.send`, handling it in `apply_custom` (`worker/src/systems/example.rs`), and building the UI under `components/`. The `Paint Selected` button shows the round trip: the driver's built-in click pick reports the selection to the page and hands it to `apply_custom` on the worker.
 
 ## Desktop
 

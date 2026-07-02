@@ -1,7 +1,8 @@
 use crate::state::Scene;
-use nightshade::prelude::Name;
+use nightshade::prelude::{Entity, Name};
 use nightshade_api::prelude::*;
-use protocol::WorkerMessage;
+use protocol::{Command, Event};
+use serde_json::Value;
 
 const SPIN_RADIANS_PER_SECOND: f32 = 0.8;
 const RING_RADIUS: f32 = 3.0;
@@ -9,8 +10,8 @@ const GOLDEN_ANGLE_RADIANS: f32 = 2.399_963;
 
 /// The per-frame logic, written as straight-line `nightshade-api` calls. Each
 /// system is a free function taking the plain `Scene` state and the engine
-/// `World`. Add more files in `src/systems/` and call them from
-/// `Scene::run_systems` to grow the game.
+/// `World`. Add more files in `src/systems/` and call them from the
+/// `run_offscreen` tick to grow the game.
 ///
 /// This one spins every spawned cube while the toggle is on and spawns another
 /// on Space.
@@ -24,6 +25,23 @@ pub fn tick(scene: &mut Scene, world: &mut World) {
 
     if key_pressed(world, KeyCode::Space) {
         spawn_cube_on_ring(scene, world);
+    }
+}
+
+/// Handles the game messages the page sends over the `Custom` channel.
+/// `selected` is the entity picked by the driver's built-in click handling.
+pub fn apply_custom(scene: &mut Scene, world: &mut World, selected: Option<Entity>, value: Value) {
+    let Ok(command) = serde_json::from_value::<Command>(value) else {
+        return;
+    };
+    match command {
+        Command::SetSpin { spinning } => scene.spinning = spinning,
+        Command::SpawnCube => spawn_cube_on_ring(scene, world),
+        Command::PaintSelected => {
+            if let Some(entity) = selected {
+                set_color(world, entity, [0.98, 0.57, 0.24, 1.0]);
+            }
+        }
     }
 }
 
@@ -41,7 +59,7 @@ pub fn spawn_cube_on_ring(scene: &mut Scene, world: &mut World) {
     set_color(world, cube, color_for(index));
     world.core.set_name(cube, Name(format!("Cube {index}")));
     scene.cubes.push(cube);
-    crate::post(&WorkerMessage::CubeCount {
+    nightshade_api::offscreen::post_custom(&Event::CubeCount {
         count: scene.cubes.len() as u32,
     });
 }

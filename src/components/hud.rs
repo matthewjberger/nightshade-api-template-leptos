@@ -1,18 +1,15 @@
 use leptos::prelude::*;
-use protocol::ClientMessage;
+use nightshade_api::web::Engine;
+use protocol::Command;
 use wasm_bindgen::JsCast;
 
-use crate::bridge::{Bridge, send};
 use crate::state::TemplateState;
 
 /// Example HUD panel: renderer facts streamed from the worker, a spin toggle,
 /// and a button that sends a game message back. Replace with your own UI as
 /// the game grows.
 #[component]
-pub fn Hud(
-    bridge: StoredValue<Option<Bridge>, LocalStorage>,
-    state: TemplateState,
-) -> impl IntoView {
+pub fn Hud(engine: Engine, state: TemplateState) -> impl IntoView {
     let on_spawn = move |event: web_sys::MouseEvent| {
         if let Some(button) = event
             .target()
@@ -20,33 +17,31 @@ pub fn Hud(
         {
             let _ = button.blur();
         }
-        if let Some(bridge) = bridge.get_value() {
-            send(&bridge, &ClientMessage::SpawnCube);
-        }
+        engine.send(&Command::SpawnCube);
     };
 
     let on_spin = move |event: web_sys::Event| {
         let spinning = event_target_checked(&event);
         state.spinning.set(spinning);
-        if let Some(bridge) = bridge.get_value() {
-            send(&bridge, &ClientMessage::SetSpin { spinning });
-        }
+        engine.send(&Command::SetSpin { spinning });
     };
+
+    let on_paint = move |_| engine.send(&Command::PaintSelected);
 
     view! {
         <div class="hud">
             <div class="hud-title">"nightshade-api + leptos"</div>
             <div class="hud-row">
                 <span class="hud-label">"Adapter"</span>
-                <span>{move || state.adapter.get()}</span>
+                <span>{move || engine.state.adapter.get()}</span>
             </div>
             <div class="hud-row">
                 <span class="hud-label">"FPS"</span>
-                <span>{move || format!("{:.0}", state.fps.get())}</span>
+                <span>{move || format!("{:.0}", engine.state.fps.get())}</span>
             </div>
             <div class="hud-row">
                 <span class="hud-label">"Entities"</span>
-                <span>{move || state.entity_count.get()}</span>
+                <span>{move || engine.state.entity_count.get()}</span>
             </div>
             <div class="hud-row">
                 <span class="hud-label">"Cubes"</span>
@@ -56,7 +51,8 @@ pub fn Hud(
                 <span class="hud-label">"Selected"</span>
                 <span>
                     {move || {
-                        state
+                        engine
+                            .state
                             .selected
                             .get()
                             .map(|detail| format!("{} ({})", detail.name, detail.id))
@@ -66,6 +62,13 @@ pub fn Hud(
             </div>
             <button class="hud-button" on:click=on_spawn>
                 "Spawn Cube (Space)"
+            </button>
+            <button
+                class="hud-button"
+                disabled=move || engine.state.selected.get().is_none()
+                on:click=on_paint
+            >
+                "Paint Selected"
             </button>
             <label class="hud-toggle">
                 <input
