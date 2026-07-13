@@ -57,7 +57,7 @@ pub fn spawn_cube_on_ring(scene: &mut Scene, world: &mut World) {
     };
     let cube = spawn_cube(world, position);
     set_color(world, cube, color_for(index));
-    world.core.set_name(cube, Name(format!("Cube {index}")));
+    world.ecs.worlds[CORE].set(cube, Name(format!("Cube {index}")));
     scene.cubes.push(cube);
     nightshade_api::offscreen::post_custom(&Event::CubeCount {
         count: scene.cubes.len() as u32,
