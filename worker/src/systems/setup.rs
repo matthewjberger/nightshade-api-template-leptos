@@ -20,8 +20,8 @@ pub fn initialize(scene: &mut Scene, world: &mut World) {
 
     set_background(world, Background::Nebula);
     show_grid(world, true);
-    world.resources.debug_draw.selection_outline_enabled = true;
-    world.resources.debug_draw.selection_outline_color = [1.0, 0.5, 0.15, 1.0];
+    world.resources.selection.outline_enabled = true;
+    world.resources.selection.outline_color = [1.0, 0.5, 0.15, 1.0];
 
     load_procedural_textures(world);
     spawn_sun(world);
