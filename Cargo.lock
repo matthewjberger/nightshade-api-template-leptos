@@ -3251,7 +3251,9 @@ checksum = "60993920e071b0c9b66f14e2b32740a4e27ffc82854dcd72035887f336a09a28"
 
 [[package]]
 name = "nightshade"
-version = "0.51.0"
+version = "0.53.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "da2c49300b600ddd9b24f3e23122dbde8fccd0240a457dfb7739093ba8be44ba"
 dependencies = [
  "accesskit",
  "accesskit_winit",
@@ -3276,7 +3278,6 @@ dependencies = [
  "js-sys",
  "lz4_flex",
  "mint",
- "naga_oil",
  "nalgebra",
  "nalgebra-glm",
  "nightshade-renderer",
@@ -3299,13 +3300,14 @@ dependencies = [
  "web-sys",
  "web-time",
  "webbrowser",
- "wgpu",
  "winit",
 ]
 
 [[package]]
 name = "nightshade-api"
-version = "0.51.0"
+version = "0.53.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b64638e6eccdb318992b11114041911d99e71b26b41cc68adf1cad2f78d612c8"
 dependencies = [
  "bincode",
  "console_error_panic_hook",
@@ -3324,7 +3326,9 @@ dependencies = [
 
 [[package]]
 name = "nightshade-renderer"
-version = "0.51.0"
+version = "0.53.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "362f64e5772870deb6533cd80da61c0aedb74f08f7bf6894a2557451e0862fc5"
 dependencies = [
  "bytemuck",
  "cosmic-text",
