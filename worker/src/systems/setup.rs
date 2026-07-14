@@ -10,7 +10,7 @@ use nightshade_api::prelude::*;
 pub fn initialize(scene: &mut Scene, world: &mut World) {
     if let Some((width, height)) = world.resources.window.cached_viewport_size {
         world.resources.window.active_viewport_rect =
-            Some(nightshade::ecs::window::resources::ViewportRect {
+            Some(nightshade::render::config::ViewportRect {
                 x: 0.0,
                 y: 0.0,
                 width: width as f32,
