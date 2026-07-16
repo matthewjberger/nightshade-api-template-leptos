@@ -9,11 +9,11 @@ use nightshade_api::prelude::*;
 /// expose, so it is set directly.
 pub fn initialize(scene: &mut Scene, world: &mut World) {
     if let Some((width, height)) = world
-        .expect_resource::<nightshade::ecs::window::resources::Window>()
+        .res::<nightshade::ecs::window::resources::Window>()
         .cached_viewport_size
     {
         world
-            .expect_resource_mut::<nightshade::ecs::window::resources::Window>()
+            .res_mut::<nightshade::ecs::window::resources::Window>()
             .active_viewport_rect = Some(nightshade::render::config::ViewportRect {
             x: 0.0,
             y: 0.0,
@@ -25,10 +25,10 @@ pub fn initialize(scene: &mut Scene, world: &mut World) {
     set_background(world, Background::Nebula);
     show_grid(world, true);
     world
-        .expect_resource_mut::<nightshade::ecs::graphics::selection::Selection>()
+        .res_mut::<nightshade::ecs::graphics::selection::Selection>()
         .outline_enabled = true;
     world
-        .expect_resource_mut::<nightshade::ecs::graphics::selection::Selection>()
+        .res_mut::<nightshade::ecs::graphics::selection::Selection>()
         .outline_color = [1.0, 0.5, 0.15, 1.0];
 
     load_procedural_textures(world);
