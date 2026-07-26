@@ -1,5 +1,5 @@
 use leptos::prelude::*;
-use nightshade_api::web::{EngineViewport, Loader, UiStyles, WebGpuGate, use_engine};
+use nightshade_leptos::{EngineViewport, Loader, UiStyles, WebGpuGate, use_engine};
 use protocol::Event;
 
 use crate::components::hud::Hud;

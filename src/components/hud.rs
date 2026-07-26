@@ -1,5 +1,5 @@
 use leptos::prelude::*;
-use nightshade_api::web::Engine;
+use nightshade_leptos::Engine;
 use protocol::Command;
 use wasm_bindgen::JsCast;
 
