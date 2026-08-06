@@ -1,6 +1,6 @@
 use crate::state::Scene;
 use crate::systems::example;
-use nightshade::prelude::{Selection, ViewportRect, Window, load_procedural_textures, spawn_sun};
+use nightshade::prelude::{Selection, load_procedural_textures, spawn_sun};
 use nightshade_api::prelude::*;
 
 /// Builds the scene through the `nightshade-api` facade: background and image
@@ -8,15 +8,6 @@ use nightshade_api::prelude::*;
 /// cube. The selection outline is an engine setting the facade does not
 /// expose, so it is set directly.
 pub fn initialize(scene: &mut Scene, world: &mut World) {
-    if let Some((width, height)) = world.res::<Window>().cached_viewport_size {
-        world.res_mut::<Window>().active_viewport_rect = Some(ViewportRect {
-            x: 0.0,
-            y: 0.0,
-            width: width as f32,
-            height: height as f32,
-        });
-    }
-
     set_background(world, Background::Nebula);
     show_grid(world, true);
     world.res_mut::<Selection>().outline_enabled = true;
